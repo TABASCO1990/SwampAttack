@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(Animator))]
 public class Player : MonoBehaviour
@@ -14,6 +15,9 @@ public class Player : MonoBehaviour
     private Animator _animator;
 
     public int Money { get; private set; }
+
+    public event UnityAction<int, int> HealthChanged;
+    public event UnityAction<int> MoneyChanged;
 
     private void Start()
     {
@@ -34,6 +38,8 @@ public class Player : MonoBehaviour
     {
         _currntHealth -= damage;
 
+        HealthChanged?.Invoke(_currntHealth, _health);
+
         if (_currntHealth <= 0)
             Destroy(gameObject);
     }
@@ -41,5 +47,13 @@ public class Player : MonoBehaviour
     public void AddMoney(int money)
     {
         Money += money;
+        MoneyChanged?.Invoke(Money);
+    }
+
+    public void BuyWeapon(Weapon weapon)
+    {
+        Money -= weapon.Price;
+        MoneyChanged?.Invoke(Money);
+        _weapons.Add(weapon);
     }
 }
